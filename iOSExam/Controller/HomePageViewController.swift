@@ -22,9 +22,6 @@ class HomePageViewController: UIViewController, UICollectionViewDataSource, UICo
     // 建立一個 ApiHelper 物件
     let apiHelper = ApiHelper()
     
-    // 設定初始是否為收藏書籍
-    var likeThisBook = false
-    
     // 設定儲存UUID的set
     var uuidSet = Set<Int>()
     
@@ -102,11 +99,9 @@ class HomePageViewController: UIViewController, UICollectionViewDataSource, UICo
         if uuidSet.contains(item.uuid) {
             cell.likeButton.setImage(UIImage(systemName: "heart.fill"), for: .normal)
             cell.likeButton.tintColor = .systemMint
-            likeThisBook = true
         } else {
             cell.likeButton.setImage(UIImage(systemName: "heart"), for: .normal)
             cell.likeButton.tintColor = .white
-            likeThisBook = false
         }
         
         return cell
@@ -127,33 +122,28 @@ class HomePageViewController: UIViewController, UICollectionViewDataSource, UICo
 
 extension HomePageViewController: HomePageCollectionViewCellDelegate {
     func HomePageCollectionViewCell(_Cell: HomePageCollectionViewCell, didPressLikeButton Button: Any) {
-        if likeThisBook == false {
-            _Cell.likeButton.setImage(UIImage(systemName: "heart.fill"), for: .normal)
-            _Cell.likeButton.tintColor = .systemMint
-            likeThisBook = true
-            if let indexPath = collectionView.indexPath(for: _Cell) {
-                let selectedItem = items[indexPath.row]
-                
-                // 存入uuid set
-                uuidSet.insert(selectedItem.uuid)
-                print(uuidSet)
-                saveUUIDSetToUserDefaults()
-            }
-            
-        } else {
-            _Cell.likeButton.setImage(UIImage(systemName: "heart"), for: .normal)
-            _Cell.likeButton.tintColor = .white
-            likeThisBook = false
-            if let indexPath = collectionView.indexPath(for: _Cell) {
-                let selectedItem = items[indexPath.row]
-                
-                // 刪除uuid set
-                uuidSet.remove(selectedItem.uuid)
-                print(uuidSet)
-                saveUUIDSetToUserDefaults()
-            }
+        if let indexPath = collectionView.indexPath(for: _Cell) {
+            let selectedItem = items[indexPath.row]
+            didPressLikeButtonFor(uuid: selectedItem.uuid)
         }
     }
+        
+    func didPressLikeButtonFor(uuid: Int) {
+        if uuidSet.contains(uuid) {
+            uuidSet.remove(uuid)
+        } else {
+            uuidSet.insert(uuid)
+        }
+        saveUUIDSetToUserDefaults()
+        //        collectionView.reloadData()
+        
+        if let index = items.firstIndex(where: { datum in
+            return datum.uuid == uuid
+        }) {
+            collectionView.reloadItems(at: [IndexPath(item: index, section: 0)])
+        }
+    }
+    
     func saveUUIDSetToUserDefaults() {
         let uuidArray = Array(uuidSet)
         if let encodedData = try? JSONEncoder().encode(uuidArray) {

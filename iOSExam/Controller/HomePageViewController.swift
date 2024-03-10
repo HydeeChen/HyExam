@@ -6,12 +6,15 @@
 //
 
 import UIKit
+import Combine
 import Kingfisher
 
 class HomePageViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
     // 宣告符合api資料結構的變數items
-    var items: [UserListDatum]!
+    @Published var items: [UserListDatum] = []
+    
+    private var anyCancelables = Set<AnyCancellable>()
     
     // 設定api之url
     let examURL = URL(string:"https://mservice.ebook.hyread.com.tw/exam/user-list")
@@ -23,7 +26,7 @@ class HomePageViewController: UIViewController, UICollectionViewDataSource, UICo
     let apiHelper = ApiHelper()
     
     // 設定儲存UUID的set
-    var uuidSet = Set<Int>()
+    @Published var uuidSet = Set<Int>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,8 +65,8 @@ class HomePageViewController: UIViewController, UICollectionViewDataSource, UICo
                     // API 請求成功
                     self.items = items
                     DispatchQueue.main.async {
-                          self.collectionView.reloadData()
-                        }
+                        self.collectionView.reloadData()
+                    }
                 } else {
                     // API 請求失敗
                     // 顯示錯誤訊息
@@ -74,6 +77,12 @@ class HomePageViewController: UIViewController, UICollectionViewDataSource, UICo
         loadUUIDSetFromUserDefaults()
         print("uuidSet after loading from UserDefaults: \(uuidSet)")
         
+        $items
+            .combineLatest($uuidSet)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] items, set in
+                self?.collectionView.reloadData()
+            }.store(in: &anyCancelables)
     }
     
     
@@ -127,7 +136,7 @@ extension HomePageViewController: HomePageCollectionViewCellDelegate {
             didPressLikeButtonFor(uuid: selectedItem.uuid)
         }
     }
-        
+    
     func didPressLikeButtonFor(uuid: Int) {
         if uuidSet.contains(uuid) {
             uuidSet.remove(uuid)
@@ -135,19 +144,14 @@ extension HomePageViewController: HomePageCollectionViewCellDelegate {
             uuidSet.insert(uuid)
         }
         saveUUIDSetToUserDefaults()
-        //        collectionView.reloadData()
         
-        if let index = items.firstIndex(where: { datum in
-            return datum.uuid == uuid
-        }) {
-            collectionView.reloadItems(at: [IndexPath(item: index, section: 0)])
-        }
     }
     
     func saveUUIDSetToUserDefaults() {
         let uuidArray = Array(uuidSet)
         if let encodedData = try? JSONEncoder().encode(uuidArray) {
             UserDefaults.standard.set(encodedData, forKey: "uuidSet")
+            
         }
     }
 }

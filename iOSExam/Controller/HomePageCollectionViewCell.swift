@@ -49,7 +49,7 @@ class HomePageCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(bookName)
         
         // 新增收藏的like按鈕
-        likeButton = createButton(imageName: "heart", action: #selector(likeButtonTapped))
+        likeButton = createButton(imageName: "heart", action: #selector(likeButtonTapped(_:)))
         
         // 設定按鈕的 constraints
         likeButton.translatesAutoresizingMaskIntoConstraints = false
@@ -85,7 +85,7 @@ class HomePageCollectionViewCell: UICollectionViewCell {
     }
     
     // 設定按下按鈕的功能
-    @objc func likeButtonTapped() {
+    @objc func likeButtonTapped(_ sender: UIButton) {
         delegate?.HomePageCollectionViewCell(_Cell: self, didPressLikeButton: "")
     }
     

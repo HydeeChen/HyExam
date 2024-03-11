@@ -13,7 +13,7 @@
         </array>
     </customFonts>
     <scenes>
-        <!--Home Page View Controller-->
+        <!--首頁-->
         <scene sceneID="hO2-TZ-7X1">
             <objects>
                 <viewController storyboardIdentifier="HomePageViewController" id="CvW-Ai-CqY" customClass="HomePageViewController" customModule="iOSExam" customModuleProvider="target" sceneMemberID="viewController">
@@ -33,10 +33,25 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VJi-2V-5gU">
+                                <rect key="frame" x="257" y="35" width="128" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="gray" title="修改會員資料"/>
+                                <connections>
+                                    <action selector="pressButton:" destination="CvW-Ai-CqY" eventType="touchUpInside" id="R3U-Ee-OLM"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="4gn-tC-JkT"/>
                         <color key="backgroundColor" systemColor="labelColor"/>
                     </view>
+                    <tabBarItem key="tabBarItem" title="首頁" image="house" catalog="system" id="UWJ-NF-p6x"/>
+                    <navigationItem key="navigationItem" id="1Mz-fP-In0"/>
+                    <connections>
+                        <outlet property="replaceDataButtonOutlet" destination="VJi-2V-5gU" id="G7a-kA-8vC"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zWf-7Y-v3l" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -44,6 +59,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="house" catalog="system" width="128" height="104"/>
         <image name="xmark" catalog="system" width="128" height="113"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

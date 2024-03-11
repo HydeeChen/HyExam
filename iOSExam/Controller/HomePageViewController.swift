@@ -8,6 +8,8 @@
 import UIKit
 import Combine
 import Kingfisher
+import Security
+
 
 class HomePageViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
@@ -27,6 +29,10 @@ class HomePageViewController: UIViewController, UICollectionViewDataSource, UICo
     
     // 設定儲存UUID的set
     @Published var uuidSet = Set<Int>()
+    
+    // 修改會員資料按鈕outlet
+    @IBOutlet weak var replaceDataButtonOutlet: UIButton!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -127,6 +133,36 @@ class HomePageViewController: UIViewController, UICollectionViewDataSource, UICo
         }
     }
     
+    // 修改會員資料按鈕之function
+    @IBAction func pressButton(_ sender: Any) {
+        // 假設你有用戶名稱需要存儲到 Keychain 中
+                let newUsername = "hydee"
+
+                // 呼叫 Keychain 相關方法保存資料
+                saveToKeychain(username: newUsername)
+                print(newUsername)
+    }
+    // Keychain 相關方法
+        func saveToKeychain(username: String) {
+            // 以 kSecClassGenericPassword 作為識別，這裡以 username 作為帳號
+            let query = [
+                kSecClass: kSecClassGenericPassword,
+                kSecAttrAccount: "username", // 這裡可以自定義 Keychain 中的帳號識別
+                kSecValueData: username.data(using: .utf8)!,
+                kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+            ] as CFDictionary
+
+            // 先刪除現有的資料，再保存新的資料
+            SecItemDelete(query)
+
+            // 添加新的資料到 Keychain
+            let status = SecItemAdd(query, nil)
+            guard status == errSecSuccess else {
+                print("Failed to save data to Keychain.")
+                return
+            }
+            print("Data saved to Keychain.")
+        }
 }
 
 extension HomePageViewController: HomePageCollectionViewCellDelegate {
@@ -144,7 +180,6 @@ extension HomePageViewController: HomePageCollectionViewCellDelegate {
             uuidSet.insert(uuid)
         }
         saveUUIDSetToUserDefaults()
-        
     }
     
     func saveUUIDSetToUserDefaults() {
